@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>${titulo} | Escola de Comércio de Lisboa</title>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/estilo.css">
+</head>
+<body>
+<header class="topo">
+    <div class="contentor topo-conteudo">
+        <a class="marca" href="${pageContext.request.contextPath}/inicio">
+            <span class="marca-sigla">ECL</span>
+            <span class="marca-nome">Escola de Comércio de Lisboa</span>
+        </a>
+        <nav class="menu">
+            <a href="${pageContext.request.contextPath}/cursos">Oferta formativa</a>
+            <a href="${pageContext.request.contextPath}/pre-inscricao">Pré-inscrição</a>
+            <a href="${pageContext.request.contextPath}/avarias">Avarias</a>
+            <c:choose>
+                <c:when test="${not empty sessionScope.admin}">
+                    <a href="${pageContext.request.contextPath}/gestao/inscricoes">Gestão</a>
+                    <a href="${pageContext.request.contextPath}/logout">Sair</a>
+                </c:when>
+                <c:otherwise>
+                    <a href="${pageContext.request.contextPath}/login">Gestão</a>
+                </c:otherwise>
+            </c:choose>
+        </nav>
+    </div>
+</header>
+<main class="contentor">
