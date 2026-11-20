@@ -13,13 +13,10 @@ import pt.ecl.model.PreInscricao;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.time.LocalDate;
-import java.time.Period;
-import java.time.format.DateTimeParseException;
 import java.util.HashMap;
 import java.util.Map;
 
-@WebServlet({"/pre-inscricao", "/pre-inscricao/sucesso"})
+@WebServlet({"/pre-inscricao", "/pre-inscricao/confirmacao"})
 public class PreInscricaoServlet extends HttpServlet {
 
     private final CursoDAO cursoDAO = new CursoDAO();
@@ -28,7 +25,7 @@ public class PreInscricaoServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        if (request.getServletPath().equals("/pre-inscricao/sucesso")) {
+        if (request.getServletPath().equals("/pre-inscricao/confirmacao")) {
             HttpSession sessao = request.getSession();
             PreInscricao p = (PreInscricao) sessao.getAttribute("inscricaoFeita");
             if (p == null) {
@@ -37,56 +34,43 @@ public class PreInscricaoServlet extends HttpServlet {
             }
             sessao.removeAttribute("inscricaoFeita");
             request.setAttribute("inscricao", p);
-            request.getRequestDispatcher("/WEB-INF/views/pre-inscricao-sucesso.jsp").forward(request, response);
+            request.getRequestDispatcher("/WEB-INF/views/pre-inscricao-confirmacao.jsp").forward(request, response);
             return;
         }
 
-        String curso = request.getParameter("curso");
-        request.setAttribute("cursoId", curso == null ? "" : curso);
+        request.setAttribute("cursoId", Parametros.texto(request, "curso"));
         mostrarFormulario(request, response);
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        String nome = limpar(request.getParameter("nome"));
-        String email = limpar(request.getParameter("email"));
-        String telefone = limpar(request.getParameter("telefone")).replace(" ", "");
-        String dataNascimento = limpar(request.getParameter("dataNascimento"));
-        String cursoId = limpar(request.getParameter("curso"));
-        String observacoes = limpar(request.getParameter("observacoes"));
-        String rgpd = request.getParameter("rgpd");
+        String nome = Parametros.texto(request, "nome");
+        String email = Parametros.texto(request, "email");
+        String telefone = Parametros.texto(request, "telefone").replace(" ", "");
+        String cursoId = Parametros.texto(request, "curso");
+        String observacoes = Parametros.texto(request, "observacoes");
+        boolean privacidade = request.getParameter("privacidade") != null;
 
         Map<String, String> erros = new HashMap<>();
 
         if (nome.length() < 3) {
-            erros.put("nome", "Indica o nome completo.");
+            erros.put("nome", "Indica o nome completo (mínimo 3 caracteres).");
+        } else if (nome.length() > 120) {
+            erros.put("nome", "O nome não pode ter mais de 120 caracteres.");
         }
 
-        if (!email.matches("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$")) {
+        if (email.length() > 120 || !email.matches("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$")) {
             erros.put("email", "Indica um email válido.");
         }
 
-        if (!telefone.matches("^[29]\\d{8}$")) {
+        if (!telefone.isEmpty() && !telefone.matches("^[29]\\d{8}$")) {
             erros.put("telefone", "O telefone tem de ter 9 dígitos e começar por 9 ou 2.");
         }
 
-        LocalDate data = null;
+        Curso curso;
         try {
-            data = LocalDate.parse(dataNascimento);
-            int idade = Period.between(data, LocalDate.now()).getYears();
-            if (data.isAfter(LocalDate.now()) || idade < 14 || idade > 100) {
-                erros.put("dataNascimento", "A idade tem de estar entre 14 e 100 anos.");
-            }
-        } catch (DateTimeParseException e) {
-            erros.put("dataNascimento", "Indica a data de nascimento.");
-        }
-
-        Curso curso = null;
-        try {
-            curso = cursoDAO.procurarPorId(Integer.parseInt(cursoId));
-        } catch (NumberFormatException e) {
-            curso = null;
+            curso = cursoDAO.procurarPorId(Parametros.inteiro(request, "curso"));
         } catch (SQLException e) {
             throw new ServletException(e);
         }
@@ -98,8 +82,8 @@ public class PreInscricaoServlet extends HttpServlet {
             erros.put("observacoes", "As observações não podem ter mais de 500 caracteres.");
         }
 
-        if (rgpd == null) {
-            erros.put("rgpd", "Tens de autorizar o tratamento dos dados para continuar.");
+        if (!privacidade) {
+            erros.put("privacidade", "Tens de confirmar que leste a informação de privacidade.");
         }
 
         if (!erros.isEmpty()) {
@@ -107,10 +91,9 @@ public class PreInscricaoServlet extends HttpServlet {
             request.setAttribute("nome", nome);
             request.setAttribute("email", email);
             request.setAttribute("telefone", telefone);
-            request.setAttribute("dataNascimento", dataNascimento);
             request.setAttribute("cursoId", cursoId);
             request.setAttribute("observacoes", observacoes);
-            request.setAttribute("rgpd", rgpd != null);
+            request.setAttribute("privacidade", privacidade);
             mostrarFormulario(request, response);
             return;
         }
@@ -118,20 +101,20 @@ public class PreInscricaoServlet extends HttpServlet {
         PreInscricao p = new PreInscricao();
         p.setNome(nome);
         p.setEmail(email);
-        p.setTelefone(telefone);
-        p.setDataNascimento(data);
+        p.setTelefone(telefone.isEmpty() ? null : telefone);
         p.setCursoId(curso.getId());
         p.setNomeCurso(curso.getNome());
-        p.setObservacoes(observacoes);
+        p.setObservacoes(observacoes.isEmpty() ? null : observacoes);
+        p.setEstado("Recebida");
 
         try {
-            preInscricaoDAO.inserir(p);
+            p.setCodigo(preInscricaoDAO.inserir(p));
         } catch (SQLException e) {
             throw new ServletException(e);
         }
 
         request.getSession().setAttribute("inscricaoFeita", p);
-        response.sendRedirect(request.getContextPath() + "/pre-inscricao/sucesso");
+        response.sendRedirect(request.getContextPath() + "/pre-inscricao/confirmacao");
     }
 
     private void mostrarFormulario(HttpServletRequest request, HttpServletResponse response)
@@ -142,9 +125,5 @@ public class PreInscricaoServlet extends HttpServlet {
             throw new ServletException(e);
         }
         request.getRequestDispatcher("/WEB-INF/views/pre-inscricao.jsp").forward(request, response);
-    }
-
-    private String limpar(String valor) {
-        return valor == null ? "" : valor.trim();
     }
 }
