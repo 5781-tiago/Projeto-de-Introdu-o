@@ -9,6 +9,10 @@
             <h1>Página não encontrada</h1>
             <p>O endereço que procuras não existe.</p>
         </c:when>
+        <c:when test="${pageContext.errorData.statusCode == 403}">
+            <h1>Acesso não autorizado</h1>
+            <p>Não tens permissão para realizar esta operação.</p>
+        </c:when>
         <c:otherwise>
             <h1>Ocorreu um erro</h1>
             <p>Não foi possível concluir o pedido. Tenta novamente daqui a pouco.</p>

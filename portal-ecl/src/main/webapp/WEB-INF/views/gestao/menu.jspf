@@ -1,0 +1,14 @@
+<div class="barra-gestao">
+    <nav class="separadores">
+        <a class="${separador eq 'resumo' ? 'ativo' : ''}" href="${pageContext.request.contextPath}/gestao">Resumo</a>
+        <a class="${separador eq 'cursos' ? 'ativo' : ''}" href="${pageContext.request.contextPath}/gestao/cursos">Cursos</a>
+        <c:if test="${sessionScope.utilizador.perfil eq 'Gestor'}">
+            <a class="${separador eq 'inscricoes' ? 'ativo' : ''}" href="${pageContext.request.contextPath}/gestao/inscricoes">Pré-inscrições</a>
+        </c:if>
+        <a class="${separador eq 'ocorrencias' ? 'ativo' : ''}" href="${pageContext.request.contextPath}/gestao/ocorrencias">Ocorrências</a>
+    </nav>
+    <div class="sessao">
+        <c:out value="${sessionScope.utilizador.nome}" /> (<c:out value="${sessionScope.utilizador.perfil}" />)
+        · <a href="${pageContext.request.contextPath}/logout">Sair</a>
+    </div>
+</div>
