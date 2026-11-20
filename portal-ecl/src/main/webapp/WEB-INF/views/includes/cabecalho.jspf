@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>${titulo} | Escola de Comércio de Lisboa</title>
+    <title><c:out value="${titulo}" /> | Portal ECL — Serviços</title>
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/estilo.css">
 </head>
 <body>
@@ -11,21 +11,16 @@
     <div class="contentor topo-conteudo">
         <a class="marca" href="${pageContext.request.contextPath}/inicio">
             <span class="marca-sigla">ECL</span>
-            <span class="marca-nome">Escola de Comércio de Lisboa</span>
+            <span class="marca-nome">Portal ECL — Serviços</span>
         </a>
+        <input type="checkbox" id="menu-abrir" class="menu-abrir" aria-label="Abrir menu">
+        <label for="menu-abrir" class="menu-botao">Menu</label>
         <nav class="menu">
-            <a href="${pageContext.request.contextPath}/cursos">Oferta formativa</a>
-            <a href="${pageContext.request.contextPath}/pre-inscricao">Pré-inscrição</a>
-            <a href="${pageContext.request.contextPath}/avarias">Avarias</a>
-            <c:choose>
-                <c:when test="${not empty sessionScope.admin}">
-                    <a href="${pageContext.request.contextPath}/gestao/inscricoes">Gestão</a>
-                    <a href="${pageContext.request.contextPath}/logout">Sair</a>
-                </c:when>
-                <c:otherwise>
-                    <a href="${pageContext.request.contextPath}/login">Gestão</a>
-                </c:otherwise>
-            </c:choose>
+            <a href="${pageContext.request.contextPath}/inicio" class="${menu eq 'inicio' ? 'ativo' : ''}">Início</a>
+            <a href="${pageContext.request.contextPath}/cursos" class="${menu eq 'cursos' ? 'ativo' : ''}">Oferta formativa</a>
+            <a href="${pageContext.request.contextPath}/pre-inscricao" class="${menu eq 'pre-inscricao' ? 'ativo' : ''}">Pré-inscrição</a>
+            <a href="${pageContext.request.contextPath}/avarias" class="${menu eq 'avarias' ? 'ativo' : ''}">Reportar avaria</a>
+            <a href="${pageContext.request.contextPath}/gestao" class="${menu eq 'gestao' ? 'ativo' : ''}">Área reservada</a>
         </nav>
     </div>
 </header>

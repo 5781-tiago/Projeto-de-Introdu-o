@@ -1,7 +1,8 @@
 </main>
 <footer class="rodape">
     <div class="contentor">
-        Escola de Comércio de Lisboa · Projeto do módulo de desenvolvimento web em Java
+        <p class="aviso">Projeto académico demonstrativo — não constitui um canal oficial de inscrição ou de suporte técnico da Escola de Comércio de Lisboa.</p>
+        <p>Portal ECL — Serviços · Projeto Final Integrador · Turma 3.º ATIS</p>
     </div>
 </footer>
 </body>

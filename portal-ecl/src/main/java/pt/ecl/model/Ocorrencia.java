@@ -2,7 +2,7 @@ package pt.ecl.model;
 
 import java.time.LocalDateTime;
 
-public class Ocorrencia {
+public class Ocorrencia implements java.io.Serializable {
 
     private int id;
     private String codigo;

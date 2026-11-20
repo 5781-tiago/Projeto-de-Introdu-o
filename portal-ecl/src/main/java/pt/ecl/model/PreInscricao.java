@@ -3,7 +3,7 @@ package pt.ecl.model;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-public class PreInscricao {
+public class PreInscricao implements java.io.Serializable {
 
     private int id;
     private String codigo;
