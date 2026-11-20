@@ -1,0 +1,3 @@
+db.url=jdbc:mysql://localhost:3306/ecl?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Europe/Lisbon&characterEncoding=UTF-8
+db.user=ecl_app
+db.password=COLOCAR_AQUI_A_PASSWORD
