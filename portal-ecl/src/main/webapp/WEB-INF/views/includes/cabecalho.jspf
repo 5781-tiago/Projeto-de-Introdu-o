@@ -10,8 +10,8 @@
 <header class="topo">
     <div class="contentor topo-conteudo">
         <a class="marca" href="${pageContext.request.contextPath}/inicio">
-            <span class="marca-sigla">ECL</span>
-            <span class="marca-nome">Portal ECL — Serviços</span>
+            <img class="marca-logo" src="${pageContext.request.contextPath}/img/logo-ecl.png" alt="Escola de Comércio de Lisboa">
+            <span class="marca-nome">Portal de<br>Serviços</span>
         </a>
         <input type="checkbox" id="menu-abrir" class="menu-abrir" aria-label="Abrir menu">
         <label for="menu-abrir" class="menu-botao">Menu</label>
